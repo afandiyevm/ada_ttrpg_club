@@ -25,8 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # IMPORTANT: disable cache so setup-node does not look for package-lock.json
-          cache: "none"
+          # FIX: The "cache" line is removed entirely to disable caching.
+          # If you commit a package-lock.json later, you can add: cache: 'npm'
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -38,9 +38,12 @@ jobs:
 
       - name: Build Next.js
         run: npx next build
+        # Note: If using Next.js 13.3+, ensure "output: 'export'" is in your next.config.js
+        # and remove the "next export" step below, as it is deprecated.
 
       - name: Export static site
         run: npx next export
+        # If the build command above handles export (via next.config.js), you can delete this step.
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
