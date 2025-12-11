@@ -1,0 +1,62 @@
+name: Deploy Next.js site to Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          # FIX: The "cache" line is removed entirely to disable caching.
+          # If you commit a package-lock.json later, you can add: cache: 'npm'
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          static_site_generator: next
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js
+        run: npx next build
+        # Note: If using Next.js 13.3+, ensure "output: 'export'" is in your next.config.js
+        # and remove the "next export" step below, as it is deprecated.
+
+      - name: Export static site
+        run: npx next export
+        # If the build command above handles export (via next.config.js), you can delete this step.
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
