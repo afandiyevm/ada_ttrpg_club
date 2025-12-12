@@ -7,19 +7,25 @@ class Spell(models.Model):
     school = models.CharField(max_length=50)
     casting_time = models.CharField(max_length=100)
     range = models.CharField(max_length=100)
+    spell_type = models.CharField(max_length=50, default="To be uncovered...")
+    attack_type = models.CharField(max_length=50, default="", blank=True)
     duration = models.CharField(max_length=100)
-    components = models.CharField(max_length=200)
+    components = models.JSONField(default=list)
+    material = models.CharField(default="", blank=True)
     description = models.TextField(default="To be uncovered...")
-    concentration = models.CharField(max_length=50)
+    higher_level = models.TextField(default="To be uncovered...")
+    concentration = models.BooleanField()
+    concentration_length = models.CharField(max_length=50, blank=True)
     ritual = models.BooleanField(default=False)
     source_book = models.CharField(max_length=10, default="Unknown")
+    damage = models.CharField(max_length=20, default="")
 
     def __str__(self):
         return self.name
 
 class Class(models.Model):
     name = models.CharField(max_length=50)
-    hit_die = models.CharField(max_length=50)
+    hit_die = models.IntegerField()
     primary_ability = models.CharField(max_length=50)
     saving_throws = models.JSONField(default=list)
     armor_proficiencies = models.JSONField(default=list)
